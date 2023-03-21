@@ -79,6 +79,86 @@ class BST:
         #recurse/traverse
         self.add_node(cur_node.left, new_node)
 
+# bonus content
+  def remove(self, node):
+    #data wrong type
+    if type(node) != int and type(node) != BSTNode:
+      raise ValueError("You must pass an int or a BSTNode")
+
+    else:
+      #data BSTNode, make int
+      if type(node) == BSTNode:
+        node = node.data
+
+      #node already in tree
+      if node not in self.contents:
+        raise ValueError("Value not in tree")
+
+      #call new (recursive) function; don't need to check other conditions again
+      self.remove_node(self.root, node)
+
+  def remove_node(self, cur_node, rem_node, prev_node = None):
+    # found node, now remove
+    if rem_node == cur_node.data:
+        
+      #rem_node has no children
+      if cur_node.right == None and cur_node.left == None:
+
+        if cur_node == prev_node.right:
+          prev_node.right = None
+          self.contents.remove(rem_node)
+        else:
+          prev_node.left = None
+          self.contents.remove(rem_node)
+      
+      #rem_node has one child
+      elif cur_node.right == None and cur_node.left != None:
+
+        if cur_node == prev_node.right:
+          prev_node.right = cur_node.left
+          self.contents.remove(rem_node)
+        else:
+          prev_node.left = cur_node.left
+          self.contents.remove(rem_node)
+
+      elif cur_node.left == None and cur_node.right != None:
+        
+        if cur_node == prev_node.left:
+          prev_node.left = cur_node.right
+          self.contents.remove(rem_node)
+        else:
+          prev_node.right = cur_node.right
+          self.contents.remove(rem_node)
+      
+      #rem_node has two children
+      else:
+        self.nodes = []
+        self.traverse_tree(cur_node) #get list of all descendants
+        self.nodes.remove(rem_node) #remove node we're removing from list
+        self.contents.remove(rem_node)
+        
+        # remove node and all descendants
+        if cur_node == prev_node.right:
+          prev_node.right = None
+        
+        else:
+          prev_node.left = None
+
+        # add all descendants back into tree
+        for node in self.nodes:
+          self.add(node)
+    #wrong node, traverse
+    elif rem_node > cur_node.data:
+      self.remove_node(cur_node.right, rem_node, prev_node = cur_node)
+    elif rem_node < cur_node.data:
+      self.remove_node(cur_node.left, rem_node, prev_node = cur_node)
+
+  def traverse_tree(self, node):
+    if node != None:
+      self.traverse_tree(node.right)
+      self.nodes.append(node.data)
+      self.traverse_tree(node.left)
+
 #test code
 """
 node1 = BSTNode ( 3 )
@@ -129,4 +209,12 @@ bst.add(node7)
 bst.add(node13)
 
 print('=======================\n')
+print(bst)
+
+print('=======================\n')
+bst.remove(1) #leaf/end node
+print(bst)
+
+print('=======================\n')
+bst.remove(10) #middle node
 print(bst)
